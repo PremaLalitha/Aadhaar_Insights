@@ -20,6 +20,7 @@ __pycache__/
 
 # Large Data Files (GitHub limit is 100MB)
 *.csv
+!*.parquet
 # If you want to include small CSVs, you could un-ignore them like this:
 # !Final_Processed_Dataset.csv
 

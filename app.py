@@ -8,8 +8,14 @@ st.set_page_config(page_title="Aadhaar Insight", layout="wide", page_icon="🧪"
 
 @st.cache_data
 def load_processed_data():
-    file_path = "Final_Processed_Dataset.csv"
-    df = pd.read_csv(file_path)
+    file_path = "Final_Processed_Dataset.parquet"
+    if os.path.exists(file_path):
+        df = pd.read_parquet(file_path)
+    else:
+        # Fallback to CSV if parquet doesn't exist locally
+        df = pd.read_csv("Final_Processed_Dataset.csv")
+        df.to_parquet(file_path)
+    
     if 'date' in df.columns:
         df['date'] = pd.to_datetime(df['date'], dayfirst=True, errors='coerce')
     
