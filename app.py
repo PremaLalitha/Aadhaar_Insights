@@ -15,10 +15,12 @@ def load_processed_data():
         df = pd.read_parquet(parquet_path)
     elif os.path.exists(csv_path):
         df = pd.read_csv(csv_path)
-        if 'date' in df.columns:
-            df['date'] = pd.to_datetime(df['date'], dayfirst=True, errors='coerce')
     else:
         raise FileNotFoundError("Neither Final_Processed_Dataset.parquet nor Final_Processed_Dataset.csv found.")
+    
+    # Ensure date column is datetime type
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
     
     # Memory Optimization: Use categories for strings
     for col in ['state', 'district']:
