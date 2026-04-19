@@ -1,0 +1,128 @@
+Andaman and Nicobar Islands (4 districts)
+Andhra Pradesh (36 districts)
+Arunachal Pradesh (25 districts)
+Assam (37 districts)
+Bihar (39 districts)
+Chandigarh (3 districts)
+Chhattisgarh (34 districts)
+Dadra and Nagar Haveli and Daman and Diu (3 districts)
+Delhi (12 districts)
+Goa (4 districts)
+Gujarat (33 districts)
+Haryana (24 districts)
+Himachal Pradesh (12 districts)
+Jammu and Kashmir (22 districts)
+Jharkhand (24 districts)
+Karnataka (31 districts)
+Kerala (14 districts)
+Ladakh (2 districts)
+Lakshadweep (1 district)
+Madhya Pradesh (55 districts)
+Maharashtra (38 districts)
+Manipur (12 districts)
+Meghalaya (13 districts)
+Mizoram (11 districts)
+Nagaland (17 districts)
+Odisha (30 districts)
+Puducherry (5 districts)
+Punjab (23 districts)
+Rajasthan (41 districts)
+Sikkim (6 districts)
+Tamil Nadu (38 districts)
+Telangana (33 districts)
+Tripura (8 districts)
+Uttar Pradesh (77 districts)
+Uttarakhand (14 districts)
+West Bengal (28 districts)
+
+
+📊 TOP 5 STATES BY DISTRICT COUNT:
+Uttar Pradesh: 77 districts
+Madhya Pradesh: 55 districts
+Rajasthan: 41 districts
+Bihar: 39 districts
+Maharashtra: 38 districts
+
+
+Total States: 36 (52.9% of raw data states)
+Total Districts: 786 (76.4% of raw data districts)
+Total Records: 994,402 (20.1% of raw data)
+
+
+
+Metric	Raw Data	Final Dataset	Change	Retention %
+Records	4,938,837	994,402	-3,944,435	20.1%
+States	68	36	-32	52.9%
+Districts	1,029	786	-243	76.4%
+
+
+
+RAW DATA SOURCES (Individual Files):
+Enrollment Data: 983,072 records → 55 states → 985 districts
+Biometric Data: 1,766,212 records → 57 states → 974 districts
+Demographic Data: 1,598,099 records → 65 states → 983 districts
+
+
+
+RAW DATA AGGREGATE (Combined Unique):
+Total States: 68 (across all sources)
+Total Districts: 1,029 (across all sources)
+Total Records: 4,938,837
+
+
+FINAL PROCESSED DATASET:
+Records: 994,402 (20.1% of raw data)
+States: 36 (52.9% of raw states)
+Districts: 786 (76.4% of raw districts)
+
+
+
+
+
+
+
+
+1. 🔄 Activity Counts (4 Features)
+These track how many updates were made by teenagers and adults across both streams:
+
+bio_age_5_17: Biometric updates (Age 5–17).
+bio_age_17_: Biometric updates (Age 17+).
+demo_age_5_17: Demographic updates (Age 5–17).
+demo_age_17_: Demographic updates (Age 17+).
+👥 2. Census Volume (3 Features)
+The base enrollment numbers for the district: 5. age_0_5: Infants/Children enrollment. 6. age_5_17: Youth enrollment. 7. age_18_greater: The primary adult enrollment count.
+
+📊 3. Calculated Ratios (6 Features)
+These are the "Engineered" features that provide the most predictive power: 8. dependency_ratio: Child-to-adult burden. 9. children_ratio: Percentage of children in the district. 10. adult_ratio: Percentage of adults in the district. 11. youth_ratio: Percentage of teenagers in the district. 12. aging_index: The ratio indicating a maturing population. 13. bio_demo_ratio: The balance of Biometric vs. Demographic security updates.
+
+📍 4. Location Context (2 Features)
+These tell the AI "where" the data is coming from: 14. state_encoded: The numeric ID for the State/UT. 15. district_encoded: The numeric ID for the District.
+
+📅 5. Temporal Context (2 Features)
+These tell the AI "when" the activity happened: 16. month: The month of the year (detects seasonal peaks). 17. year: The year of the record.
+
+
+#	Technical Feature Name	Category	Data Type	Description
+01	bio_age_5_17	Activity	Numeric	Biometric update counts for age group 5–17.
+02	bio_age_17_	Activity	Numeric	Biometric update counts for age group 17+.
+03	demo_age_5_17	Activity	Numeric	Demographic update counts for age group 5–17.
+04	demo_age_17_	Activity	Numeric	Demographic update counts for age group 17+.
+05	age_0_5	Census	Integer	Enrollment volume for children aged 0–5.
+06	age_5_17	Census	Integer	Enrollment volume for youth aged 5–17.
+07	age_18_greater	Census	Integer	Enrollment volume for adults (18+).
+08	dependency_ratio	Ratio	Float	The ratio of youth/children to adults.
+09	children_ratio	Ratio	Float	Percentage of district population aged 0–5.
+10	adult_ratio	Ratio	Float	Percentage of district population aged 18+.
+11	youth_ratio	Ratio	Float	Percentage of district population aged 5–17.
+12	aging_index	Ratio	Float	Measure of the adult subset relative to infants.
+13	bio_demo_ratio	Ratio	Float	Balance score between Biometric & Demographic logs.
+14	state_encoded	Location	Integer	Label-encoded identifier for the State/UT.
+15	district_encoded	Location	Integer	Label-encoded identifier for the District.
+16	month	Temporal	Integer	Numerical month (1–12) of the record.
+17	year	Temporal	Integer	Numerical year of the record.
+
+
+
+
+Voter Eligibility	Random Forest	Accuracy Score (Overall % correct)
+Voter List Quality	Gradient Boosting	F1-Score (Balance of Precision/Recall)
