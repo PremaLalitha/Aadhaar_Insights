@@ -543,7 +543,7 @@ if st.checkbox("Show PCA Analysis"):
     st.plotly_chart(
         px.scatter(x=pca_features[:, 0], y=pca_features[:, 1], 
                    title="PCA: Principal Components"),
-        use_container_width=True
+        width='stretch'
     )
 ```
 
