@@ -143,9 +143,26 @@ def show_demographics_section(f_df):
 def show_distribution_section(f_df, m_name, m_col, s_sel):
     st.header("Distribution")
     st.subheader(f"Statistical Spread of {m_name}")
+    
+    # Optimization: Downsample for very large datasets to ensure browser responsiveness
+    plot_df = f_df
+    if len(f_df) > 50000:
+        plot_df = f_df.sample(50000, random_state=42)
+        st.info(f"💡 Showing a representative sample of 50,000 records for performance.")
+
     # Optimize: Don't show all points for large datasets
-    show_points = "outliers" if len(f_df) > 5000 else "all"
-    st.plotly_chart(px.violin(f_df, y=m_col, x='state' if s_sel == "All" else None, box=True, points=show_points, color='state' if s_sel == "All" else None), use_container_width=True)
+    show_points = "outliers" if len(plot_df) > 5000 else "all"
+    
+    fig = px.violin(
+        plot_df, 
+        y=m_col, 
+        x='state' if s_sel == "All" else None, 
+        box=True, 
+        points=show_points, 
+        color='state' if s_sel == "All" else None,
+        title=f"Density and Spread of {m_name}"
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 def show_trends_section(f_df):
     st.header("Trends")
