@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import pandas as pd
 import plotly.express as px
 import os
@@ -8,10 +8,17 @@ st.set_page_config(page_title="Aadhaar Insight", layout="wide", page_icon="ðŸ�
 
 @st.cache_data
 def load_processed_data():
-    file_path = "Final_Processed_Dataset.csv"
-    df = pd.read_csv(file_path)
-    if 'date' in df.columns:
-        df['date'] = pd.to_datetime(df['date'], dayfirst=True, errors='coerce')
+    parquet_path = "Final_Processed_Dataset.parquet"
+    csv_path = "Final_Processed_Dataset.csv"
+    
+    if os.path.exists(parquet_path):
+        df = pd.read_parquet(parquet_path)
+    elif os.path.exists(csv_path):
+        df = pd.read_csv(csv_path)
+        if 'date' in df.columns:
+            df['date'] = pd.to_datetime(df['date'], dayfirst=True, errors='coerce')
+    else:
+        raise FileNotFoundError("Neither Final_Processed_Dataset.parquet nor Final_Processed_Dataset.csv found.")
     
     # Memory Optimization: Use categories for strings
     for col in ['state', 'district']:
