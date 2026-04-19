@@ -13,7 +13,7 @@ An automated intelligence platform designed to transform fragmented Aadhaar regi
 ## ⚙️ Setup & Deployment
 1. **Clone the repository**:
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/PremaLalitha/Aadhaar_Insights.git
    cd Aadhaar_Insight
    ```
 2. **Install dependencies**:
@@ -55,4 +55,4 @@ An automated intelligence platform designed to transform fragmented Aadhaar regi
 - **Streamlit** (Web Framework)
 
 ---
-Developed by [Your Name] | Aadhaar Insights Project
+Developed for Aadhaar Insights Project
