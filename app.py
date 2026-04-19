@@ -233,11 +233,16 @@ def show_deep_analytics_section(f_df):
     st.header("Deep Analytics")
     st.subheader("Advanced Visual Diagnostics")
 
-    # 1. HEATMAP
-    st.subheader("Hold/Correlation Matrix")
-    cols_to_corr = ['total_population', 'estimated_voters', 'future_voters', 'growth_indicator', 'dependency_ratio', 'bio_demo_ratio']
-    corr_df = f_df[cols_to_corr].corr()
-    st.plotly_chart(px.imshow(corr_df, text_auto=True, color_continuous_scale='RdBu_r'), width='stretch')
+    # CORRELATION MATRIX
+    st.subheader("Correlation Matrix")
+    all_potential_cols = ['total_population', 'estimated_voters', 'growth_indicator', 'dependency_ratio', 'bio_demo_ratio']
+    cols_to_corr = [c for c in all_potential_cols if c in f_df.columns]
+    
+    if cols_to_corr:
+        corr_df = f_df[cols_to_corr].corr()
+        st.plotly_chart(px.imshow(corr_df, text_auto=True, color_continuous_scale='RdBu_r'), width='stretch')
+    else:
+        st.warning("Not enough numeric columns for correlation analysis.")
 
     # 2. TREEMAP
     st.subheader("Hierarchical Population Tree")
