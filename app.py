@@ -697,12 +697,28 @@ st.divider()
 # 7. The Comprehensive Analytics Page
 # ==========================================
 
-# NEW: Dedicated Key Metrics Visualizations
-show_key_metrics_section(f_df)
-show_geographic_section(f_df, top_n, m_name, m_col, s_sel)
-show_demographics_section(f_df)
-show_distribution_section(f_df, m_name, m_col, s_sel)
-show_trends_section(f_df)
-show_deep_analytics_section(f_df)
-show_audit_section(df_p)
-show_fe_analysis_section(df_p)
+# ==========================================
+# 7. Dashboard Tabs (Performance Optimized)
+# ==========================================
+tab_overview, tab_demo, tab_trends, tab_advanced, tab_audit = st.tabs([
+    "📊 Overview", "👥 Demographics", "📈 Trends", "🔍 Advanced", "⚙️ Audit"
+])
+
+with tab_overview:
+    show_key_metrics_section(f_df)
+    show_geographic_section(f_df, top_n, m_name, m_col, s_sel)
+
+with tab_demo:
+    show_demographics_section(f_df)
+
+with tab_trends:
+    show_trends_section(f_df)
+
+with tab_advanced:
+    # Distribution and Deep Analytics are heavy; grouped here
+    show_distribution_section(f_df, m_name, m_col, s_sel)
+    show_deep_analytics_section(f_df)
+
+with tab_audit:
+    show_audit_section(df_p)
+    show_fe_analysis_section(df_p)
