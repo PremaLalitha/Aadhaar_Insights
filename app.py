@@ -4,21 +4,18 @@ import plotly.express as px
 import os
 import numpy as np
 
-st.set_page_config(page_title="Aadhaar Insight", layout="wide", page_icon="ðŸ§ª")
+st.set_page_config(page_title="Aadhaar Insight", layout="wide", page_icon="🧪")
 
 @st.cache_data
 def load_processed_data():
-    parquet_path = "Final_Processed_Dataset.parquet"
-    csv_path = "Final_Processed_Dataset.csv"
+    file_path_parquet = "Final_Processed_Dataset.parquet"
+    file_path_csv = "Final_Processed_Dataset.csv"
     
-    if os.path.exists(parquet_path):
-        df = pd.read_parquet(parquet_path)
-    elif os.path.exists(csv_path):
-        df = pd.read_csv(csv_path)
+    if os.path.exists(file_path_parquet):
+        df = pd.read_parquet(file_path_parquet)
     else:
-        raise FileNotFoundError("Neither Final_Processed_Dataset.parquet nor Final_Processed_Dataset.csv found.")
-    
-    # Ensure date column is datetime type
+        df = pd.read_csv(file_path_csv)
+        
     if 'date' in df.columns:
         df['date'] = pd.to_datetime(df['date'], errors='coerce')
     
@@ -96,7 +93,7 @@ def show_geographic_section(f_df, top_n, m_name, m_col, s_sel):
     st.subheader(f"Top {top_n} {m_name} Leaderboard")
     agg_col = 'state' if s_sel == "All" else 'district'
     st_df = f_df.groupby(agg_col)[m_col].sum().reset_index().nlargest(top_n, m_col)
-    st.plotly_chart(px.bar(st_df, x=m_col, y=agg_col, orientation='h', color=m_col), width='stretch')
+    st.plotly_chart(px.bar(st_df, x=m_col, y=agg_col, orientation='h', color=m_col), use_container_width=True)
 
 def show_demographics_section(f_df):
     st.header("Demographics")
@@ -110,10 +107,10 @@ def show_demographics_section(f_df):
             color_discrete_sequence=px.colors.sequential.Teal
         )
         fig_p.update_layout(title="Age Group Share")
-        st.plotly_chart(fig_p, width='stretch')
+        st.plotly_chart(fig_p, use_container_width=True)
 
     with demo_right:
-        # â”€â”€ Population Pyramid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # ── Population Pyramid ──────────────────────────────
         st.markdown("#### Age-Group Population Pyramid")
         age_bio  = [f_df['bio_age_5_17'].sum(),  f_df['bio_age_17_'].sum()]
         age_demo = [f_df['demo_age_5_17'].sum(), f_df['demo_age_17_'].sum()]
@@ -126,8 +123,8 @@ def show_demographics_section(f_df):
                          orientation='h', barmode='relative',
                          color_discrete_map={'Biometric':'#3D9BE9','Demographic':'#F77F00'},
                          title="Biometric  vs Demographic  updates")
-        fig_pyr.update_layout(xaxis_title="â† Demographic | Biometric â†’")
-        st.plotly_chart(fig_pyr, width='stretch')
+        fig_pyr.update_layout(xaxis_title="← Demographic | Biometric →")
+        st.plotly_chart(fig_pyr, use_container_width=True)
 
     st.divider()
     st.subheader("Age Group Breakdown by State (Top 10)")
@@ -142,15 +139,21 @@ def show_demographics_section(f_df):
         px.bar(age_state_m, x='state', y='Count', color='Age Group', barmode='group',
                color_discrete_sequence=['#00B4D8','#0077B6','#023E8A'],
                title="Age distribution across top 10 states"),
-        width='stretch'
+        use_container_width=True
     )
 
 def show_distribution_section(f_df, m_name, m_col, s_sel):
     st.header("Distribution")
     st.subheader(f"Statistical Spread of {m_name}")
-    # Optimize: Don't show all points for large datasets
-    show_points = "outliers" if len(f_df) > 5000 else "all"
-    st.plotly_chart(px.violin(f_df, y=m_col, x='state' if s_sel == "All" else None, box=True, points=show_points, color='state' if s_sel == "All" else None), width='stretch')
+    # Optimize: Sample for stability if dataset is large
+    sample_size = 50000
+    if len(f_df) > sample_size:
+        d_df = f_df.sample(sample_size, random_state=42)
+    else:
+        d_df = f_df
+    
+    show_points = "outliers" if len(d_df) > 5000 else "all"
+    st.plotly_chart(px.violin(d_df, y=m_col, x='state' if s_sel == "All" else None, box=True, points=show_points, color='state' if s_sel == "All" else None), use_container_width=True)
 
 def show_trends_section(f_df):
     st.header("Trends")
@@ -172,9 +175,9 @@ def show_trends_section(f_df):
                             color_discrete_sequence=['#3D9BE9'],
                             title=f"Monthly trend: {trend_metric.replace('_',' ')}")
         fig_trend.update_layout(xaxis_title="Month", yaxis_title=trend_metric.replace('_',' '))
-        st.plotly_chart(fig_trend, width='stretch')
+        st.plotly_chart(fig_trend, use_container_width=True)
 
-        # â”€â”€ Year-over-Year Growth Rate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # ── Year-over-Year Growth Rate ──────────────────────
         st.divider()
         st.subheader("Year-over-Year Growth Rate")
         if 'year' in f_df_t.columns:
@@ -190,10 +193,10 @@ def show_trends_section(f_df):
                 px.bar(yoy_m, x='year', y='YoY Growth %', color='Metric', barmode='group',
                        color_discrete_sequence=['#3D9BE9','#F77F00','#2EC4B6'],
                        title="Year-over-Year % change in key metrics"),
-                width='stretch'
+                use_container_width=True
             )
 
-        # â”€â”€ All Metrics on one chart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # ── All Metrics on one chart ────────────────────────
         st.divider()
         st.subheader("All Metrics Together (Normalized)")
         t_norm = t_data.copy()
@@ -206,12 +209,12 @@ def show_trends_section(f_df):
         st.plotly_chart(
             px.line(t_norm_m, x='MoY', y='Normalized Value', color='Metric', markers=True,
                     title="Normalized trend comparison (0=min, 1=max per metric)"),
-            width='stretch'
+            use_container_width=True
         )
 
-        # â”€â”€ Heatmap Calendar: Monthly activity grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # ── Heatmap Calendar: Monthly activity grid ────────────
         st.divider()
-        st.subheader("Activity Heatmap: Month Ã— Year")
+        st.subheader("Activity Heatmap: Month × Year")
         if 'year' in f_df_t.columns and 'month' in f_df_t.columns:
             heat_df = f_df_t.groupby(['year','month'])['total_population'].sum().reset_index()
             heat_pivot = heat_df.pivot(index='year', columns='month', values='total_population').fillna(0)
@@ -221,9 +224,9 @@ def show_trends_section(f_df):
             st.plotly_chart(
                 px.imshow(heat_pivot, color_continuous_scale='YlOrRd',
                           labels={'color':'New Enrolments'},
-                          title="New Enrolments heatmap â€” darker = more activity",
+                          title="New Enrolments heatmap — darker = more activity",
                           text_auto=True, aspect='auto'),
-                width='stretch'
+                use_container_width=True
             )
 
     else:
@@ -233,26 +236,27 @@ def show_deep_analytics_section(f_df):
     st.header("Deep Analytics")
     st.subheader("Advanced Visual Diagnostics")
 
-    # CORRELATION MATRIX
-    st.subheader("Correlation Matrix")
-    all_potential_cols = ['total_population', 'estimated_voters', 'growth_indicator', 'dependency_ratio', 'bio_demo_ratio']
+    # 1. HEATMAP (Dynamic Correlation Matrix)
+    st.subheader("Hold/Correlation Matrix")
+    all_potential_cols = ['total_population', 'estimated_voters', 'future_voters', 'growth_indicator', 'dependency_ratio', 'bio_demo_ratio']
+    # Safeguard: Only correlate columns that actually exist in the data
     cols_to_corr = [c for c in all_potential_cols if c in f_df.columns]
     
-    if cols_to_corr:
+    if len(cols_to_corr) > 1:
         corr_df = f_df[cols_to_corr].corr()
-        st.plotly_chart(px.imshow(corr_df, text_auto=True, color_continuous_scale='RdBu_r'), width='stretch')
+        st.plotly_chart(px.imshow(corr_df, text_auto=True, color_continuous_scale='RdBu_r'), use_container_width=True)
     else:
-        st.warning("Not enough numeric columns for correlation analysis.")
+        st.warning("Not enough numeric features for correlation analysis.")
 
     # 2. TREEMAP
     st.subheader("Hierarchical Population Tree")
-    st.plotly_chart(px.treemap(f_df.sample(min(len(f_df), 2000)), path=['state', 'district'], values='total_population', title="State > District Population Hierarchy"), width='stretch')
+    st.plotly_chart(px.treemap(f_df.sample(min(len(f_df), 2000)), path=['state', 'district'], values='total_population', title="State > District Population Hierarchy"), use_container_width=True)
 
 def show_audit_section(df_p):
     st.header("Audit")
     st.subheader("Before vs After: Dataset Comparison")
 
-    # â”€â”€ Raw columns (known from inspection) â”€â”€
+    # ── Raw columns (known from inspection) ──
     RAW_COLS = ['date', 'state', 'district', 'pincode',
                 'bio_age_5_17', 'bio_age_17_', 'demo_age_5_17', 'demo_age_17_',
                 'age_0_5', 'age_5_17', 'age_18_greater']
@@ -260,8 +264,11 @@ def show_audit_section(df_p):
     NEW_COLS  = [c for c in PROC_COLS if c not in RAW_COLS]
 
     df_raw_agg, raw_row_count = load_raw_data_summary()
+    if raw_row_count == 0:
+        # Fallback to known Master Cleaned record count when raw files are not present in deployment
+        raw_row_count = 2330468
 
-    # â”€â”€ KPI Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── KPI Row ──────────────────────────────
     RAW_INITIAL = 4938837
     ka, kb, kc, kd = st.columns(4)
     ka.metric("Stage 1: Raw Ingested", f"{RAW_INITIAL:,}", "12 Source Files")
@@ -271,11 +278,11 @@ def show_audit_section(df_p):
 
     st.divider()
 
-    # â”€â”€ Side-by-Side Schema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Side-by-Side Schema ───────────────────
     st.subheader(" Schema: Before vs After")
     col_left, col_right = st.columns(2)
 
-    # â”€â”€ Missing Value Comparison â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Missing Value Comparison ──────────────
     st.subheader("Missing Value Treatment")
     mv_left, mv_right = st.columns(2)
     with mv_left:
@@ -291,7 +298,7 @@ def show_audit_section(df_p):
             px.bar(mv_raw_df, x='Missing %', y='Column', orientation='h',
                    color='Missing %', color_continuous_scale='Reds',
                    title="Columns with Missing Values"),
-            width='stretch'
+            use_container_width=True
         )
     with mv_right:
         st.markdown("#### After (Processed)")
@@ -307,44 +314,44 @@ def show_audit_section(df_p):
 
     st.divider()
 
-    # â”€â”€ Regional Bar: Top 10 States â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Regional Bar: Top 10 States ───────────
     if df_raw_agg is not None:
         st.subheader("State-Level: Before vs After (Est. Eligible Voters)")
         c_left2, c_right2 = st.columns(2)
         with c_left2:
-            st.markdown("#### Before â€” Raw `age_18_greater`")
+            st.markdown("#### Before — Raw `age_18_greater`")
             st.plotly_chart(
                 px.bar(df_raw_agg.nlargest(10, 'age_18_greater'),
                        x='age_18_greater', y='state', orientation='h',
                        color='age_18_greater', color_continuous_scale='Blues',
                        labels={'age_18_greater': 'Age 18+ Count', 'state': 'State'}),
-                width='stretch'
+                use_container_width=True
             )
         with c_right2:
-            st.markdown("#### After â€” Engineered `estimated_voters`")
+            st.markdown("#### After — Engineered `estimated_voters`")
             top_states = df_p.groupby('state')['estimated_voters'].sum().reset_index().nlargest(10, 'estimated_voters')
             st.plotly_chart(
                 px.bar(top_states, x='estimated_voters', y='state', orientation='h',
                        color='estimated_voters', color_continuous_scale='Greens',
                        labels={'estimated_voters': 'Est. Voters', 'state': 'State'}),
-                width='stretch'
+                use_container_width=True
             )
 
     st.divider()
 
-    # â”€â”€ Sample Data Preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Sample Data Preview ───────────────────
     st.subheader("Sample Data Preview")
     prev_left, prev_right = st.columns(2)
     with prev_left:
-        st.markdown("#### Before â€” Raw Columns")
-        st.dataframe(df_p[RAW_COLS].head(5), width='stretch')
+        st.markdown("#### Before — Raw Columns")
+        st.dataframe(df_p[RAW_COLS].head(5), use_container_width=True)
     with prev_right:
-        st.markdown("#### After â€” With Engineered Features")
-        st.dataframe(df_p[['state','district'] + NEW_COLS[:8]].head(5), width='stretch')
+        st.markdown("#### After — With Engineered Features")
+        st.dataframe(df_p[['state','district'] + NEW_COLS[:8]].head(5), use_container_width=True)
 
     st.divider()
 
-    # â”€â”€ Descriptive Statistics: Before vs After (Charts) â”€â”€â”€â”€
+    # ── Descriptive Statistics: Before vs After (Charts) ────
     st.subheader("Descriptive Statistics: Before vs After (Charts)")
 
     stat_cols = ['bio_age_5_17','bio_age_17_','demo_age_5_17','demo_age_17_','age_0_5','age_5_17','age_18_greater']
@@ -358,37 +365,45 @@ def show_audit_section(df_p):
     ds_left, ds_right = st.columns(2)
 
     with ds_left:
-        st.markdown("#### Before â€” Raw Column Stats")
+        st.markdown("#### Before — Raw Column Stats")
         raw_melt = desc_raw_num.melt(id_vars='Column', var_name='Stat', value_name='Value')
         st.plotly_chart(
             px.bar(raw_melt, x='Column', y='Value', color='Stat', barmode='group',
                    color_discrete_sequence=['#3D9BE9','#F77F00','#2EC4B6'],
-                   title="Mean / Median / Max â€” Raw Columns",
+                   title="Mean / Median / Max — Raw Columns",
                    labels={'Value':'Count','Column':'Column'}),
-            width='stretch'
+            use_container_width=True
         )
 
     with ds_right:
-        st.markdown("####  After â€” Engineered Column Stats")
+        st.markdown("####  After — Engineered Column Stats")
         eng_melt = desc_eng_num.melt(id_vars='Column', var_name='Stat', value_name='Value')
         st.plotly_chart(
             px.bar(eng_melt, x='Column', y='Value', color='Stat', barmode='group',
                    color_discrete_sequence=['#3D9BE9','#F77F00','#2EC4B6'],
-                   title="Mean / Median / Max â€” Engineered Columns",
+                   title="Mean / Median / Max — Engineered Columns",
                    labels={'Value':'Value','Column':'Column'}),
-            width='stretch'
+            use_container_width=True
         )
 
     # Combined box plot for distribution comparison
     st.divider()
-    st.subheader("Distribution Comparison â€” Raw Columns (Box Plot)")
-    raw_long = df_p[stat_cols].melt(var_name='Column', value_name='Value')
+    st.subheader("Distribution Comparison — Raw Columns (Box Plot)")
+    
+    # Optimize: Sampling for the box plot (Processing 7M+ records hangs the app)
+    sample_size = 50000
+    if len(df_p) > sample_size:
+        box_df = df_p.sample(sample_size, random_state=42)
+    else:
+        box_df = df_p
+        
+    raw_long = box_df[stat_cols].melt(var_name='Column', value_name='Value')
     st.plotly_chart(
         px.box(raw_long, x='Column', y='Value', color='Column',
                color_discrete_sequence=px.colors.qualitative.Set2,
-               title="Spread of each raw column â€” Median, IQR, Outliers",
+               title="Spread of each raw column — Median, IQR, Outliers",
                points=False),
-        width='stretch'
+        use_container_width=True
     )
 
     st.divider()
@@ -435,7 +450,7 @@ def show_fe_analysis_section(df_p):
                          title="Data Volume: Before vs After Cleansing", text_auto=True)
         fig_vol.update_traces(textposition='outside')
         fig_vol.update_layout(yaxis_title="Count", xaxis_title="Metric", legend_title_text="Stage")
-        st.plotly_chart(fig_vol, width='stretch')
+        st.plotly_chart(fig_vol, use_container_width=True)
         st.divider()
         st.subheader("Geographic Standardization: Before vs After")
         geo_df = pd.DataFrame({
@@ -447,7 +462,7 @@ def show_fe_analysis_section(df_p):
         fig_geo = px.bar(geo_df, x="Level", y="Count", color="Stage", barmode="group",
                          color_discrete_map={"Before (Raw)": "#E63946", "After (Cleaned)": "#2EC4B6"},
                          title="Reduction in Unique State/District Names due to Standardization", text_auto=True)
-        st.plotly_chart(fig_geo, width='stretch')
+        st.plotly_chart(fig_geo, use_container_width=True)
 
         col1, col2 = st.columns(2)
         
@@ -457,7 +472,7 @@ def show_fe_analysis_section(df_p):
                 'Stage': ['Raw', 'After'],
                 'Feature Count': [len(df_raw_fe.columns), len(df_p.columns)]
             })
-            st.plotly_chart(px.bar(fe_counts, x='Stage', y='Feature Count', color='Stage', text_auto=True), width='stretch')
+            st.plotly_chart(px.bar(fe_counts, x='Stage', y='Feature Count', color='Stage', text_auto=True), use_container_width=True)
 
         with col2:
             st.subheader("Missing Value Treatment")
@@ -468,7 +483,7 @@ def show_fe_analysis_section(df_p):
                 'Stage': ['Before (Raw)', 'After (Cleaned)'],
                 'Missing %': [missing_before, missing_after]
             })
-            st.plotly_chart(px.bar(mv_counts, x='Stage', y='Missing %', color='Stage', text_auto=True), width='stretch')
+            st.plotly_chart(px.bar(mv_counts, x='Stage', y='Missing %', color='Stage', text_auto=True), use_container_width=True)
 
     else:
         st.warning("Raw dataset `FE/Master_Cleaned_Dataset.csv` not found for comparison.")
@@ -495,7 +510,7 @@ def show_key_metrics_section(f_df):
                         color='total_population', color_continuous_scale='Blues',
                         title="Top 10 States by New Enrolments")
         fig_enr.update_layout(xaxis_title="New Enrolments", yaxis_title="State")
-        st.plotly_chart(fig_enr, width='stretch')
+        st.plotly_chart(fig_enr, use_container_width=True)
 
     with col2:
         # Monthly trend for new enrolments
@@ -506,12 +521,12 @@ def show_key_metrics_section(f_df):
                                    color_discrete_sequence=['#1f77b4'],
                                    title="Monthly New Enrolments Trend")
             fig_enr_trend.update_layout(xaxis_title="Month", yaxis_title="New Enrolments")
-            st.plotly_chart(fig_enr_trend, width='stretch')
+            st.plotly_chart(fig_enr_trend, use_container_width=True)
 
     st.divider()
 
     # 2. Demographic Updates Visualization
-    st.subheader("ðŸ‘¥ Demographic Updates Analysis")
+    st.subheader("👥 Demographic Updates Analysis")
     col3, col4 = st.columns(2)
 
     with col3:
@@ -523,7 +538,7 @@ def show_key_metrics_section(f_df):
         fig_demo = px.pie(demo_data, values='Updates', names='Age Group',
                          color_discrete_sequence=['#ff7f0e', '#2ca02c'],
                          title="Demographic Updates by Age Group")
-        st.plotly_chart(fig_demo, width='stretch')
+        st.plotly_chart(fig_demo, use_container_width=True)
 
     with col4:
         # Top states by demographic updates
@@ -536,7 +551,7 @@ def show_key_metrics_section(f_df):
         fig_demo_state = px.bar(state_demo_melt, x='state', y='Updates', color='Age Group',
                                barmode='stack', color_discrete_sequence=['#ff7f0e', '#2ca02c'],
                                title="Top 10 States: Demographic Updates by Age")
-        st.plotly_chart(fig_demo_state, width='stretch')
+        st.plotly_chart(fig_demo_state, use_container_width=True)
 
     st.divider()
 
@@ -553,7 +568,7 @@ def show_key_metrics_section(f_df):
         fig_bio = px.pie(bio_data, values='Updates', names='Age Group',
                         color_discrete_sequence=['#d62728', '#9467bd'],
                         title="Biometric Updates by Age Group")
-        st.plotly_chart(fig_bio, width='stretch')
+        st.plotly_chart(fig_bio, use_container_width=True)
 
     with col6:
         # Top states by biometric updates
@@ -566,12 +581,12 @@ def show_key_metrics_section(f_df):
         fig_bio_state = px.bar(state_bio_melt, x='state', y='Updates', color='Age Group',
                               barmode='stack', color_discrete_sequence=['#d62728', '#9467bd'],
                               title="Top 10 States: Biometric Updates by Age")
-        st.plotly_chart(fig_bio_state, width='stretch')
+        st.plotly_chart(fig_bio_state, use_container_width=True)
 
     st.divider()
 
     # 4. Estimated Voters Visualization
-    st.subheader("ðŸ—³ï¸ Estimated Voters Analysis")
+    st.subheader("🗳️ Estimated Voters Analysis")
     col7, col8 = st.columns(2)
 
     with col7:
@@ -582,7 +597,7 @@ def show_key_metrics_section(f_df):
                            color='estimated_voters', color_continuous_scale='Greens',
                            title="Top 10 States by Estimated Voters")
         fig_voters.update_layout(xaxis_title="Estimated Voters", yaxis_title="State")
-        st.plotly_chart(fig_voters, width='stretch')
+        st.plotly_chart(fig_voters, use_container_width=True)
 
     with col8:
         # Voters vs Population ratio by state
@@ -593,12 +608,12 @@ def show_key_metrics_section(f_df):
                           color='voter_ratio', color_continuous_scale='RdYlGn',
                           title="Voter-to-Population Ratio (%) - Top 10 States")
         fig_ratio.update_layout(xaxis_title="State", yaxis_title="Voters as % of Population")
-        st.plotly_chart(fig_ratio, width='stretch')
+        st.plotly_chart(fig_ratio, use_container_width=True)
 
     st.divider()
 
     # 5. Comparative Analysis
-    st.subheader("ðŸ“ˆ Comparative Metrics Overview")
+    st.subheader("📈 Comparative Metrics Overview")
     metrics_comparison = pd.DataFrame({
         'Metric': ['New Enrolments', 'Demographic Updates', 'Biometric Updates', 'Estimated Voters'],
         'Total Count': [new_enrolments, demographic_updates, biometric_updates, estimated_voters],
@@ -617,14 +632,14 @@ def show_key_metrics_section(f_df):
                                color='Metric', color_discrete_sequence=px.colors.qualitative.Set1,
                                title="Total Counts by Metric")
         fig_comp_total.update_layout(xaxis_title="Metric", yaxis_title="Total Count")
-        st.plotly_chart(fig_comp_total, width='stretch')
+        st.plotly_chart(fig_comp_total, use_container_width=True)
 
     with col10:
         fig_comp_avg = px.bar(metrics_comparison, x='Metric', y='Average per Record',
                               color='Metric', color_discrete_sequence=px.colors.qualitative.Set1,
                               title="Average per Record by Metric")
         fig_comp_avg.update_layout(xaxis_title="Metric", yaxis_title="Average per Record")
-        st.plotly_chart(fig_comp_avg, width='stretch')
+        st.plotly_chart(fig_comp_avg, use_container_width=True)
 
 # ==========================================
 # 4. Main App Logic
@@ -697,28 +712,12 @@ st.divider()
 # 7. The Comprehensive Analytics Page
 # ==========================================
 
-# ==========================================
-# 7. Dashboard Tabs (Performance Optimized)
-# ==========================================
-tab_overview, tab_demo, tab_trends, tab_advanced, tab_audit = st.tabs([
-    "📊 Overview", "👥 Demographics", "📈 Trends", "🔍 Advanced", "⚙️ Audit"
-])
-
-with tab_overview:
-    show_key_metrics_section(f_df)
-    show_geographic_section(f_df, top_n, m_name, m_col, s_sel)
-
-with tab_demo:
-    show_demographics_section(f_df)
-
-with tab_trends:
-    show_trends_section(f_df)
-
-with tab_advanced:
-    # Distribution and Deep Analytics are heavy; grouped here
-    show_distribution_section(f_df, m_name, m_col, s_sel)
-    show_deep_analytics_section(f_df)
-
-with tab_audit:
-    show_audit_section(df_p)
-    show_fe_analysis_section(df_p)
+# NEW: Dedicated Key Metrics Visualizations
+show_key_metrics_section(f_df)
+show_geographic_section(f_df, top_n, m_name, m_col, s_sel)
+show_demographics_section(f_df)
+show_distribution_section(f_df, m_name, m_col, s_sel)
+show_trends_section(f_df)
+show_deep_analytics_section(f_df)
+show_audit_section(df_p)
+show_fe_analysis_section(df_p)
