@@ -43,7 +43,7 @@ Aadhaar Insight consolidates enrolment, biometric, and demographic registration 
 | Master Cleaned Dataset  | After Cleaning, Deduplication & Merging             | 2,330,468 |
 | Final Optimized Dataset | After Feature Engineering & Aggregation             | 994,402   |
 
----
+
 
 ## Key Metrics
 
