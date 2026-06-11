@@ -1,0 +1,31 @@
+# Virtual Environments
+.venv/
+.venv-1/
+env/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Large Data Files (GitHub limit is 100MB)
+*.csv
+!*.parquet
+# If you want to include small CSVs, you could un-ignore them like this:
+# !Final_Processed_Dataset.csv
+
+# Streamlit
+.streamlit/
+
+# Antigravity artifacts
+.gemini/
