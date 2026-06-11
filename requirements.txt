@@ -1,6 +1,7 @@
 streamlit
 pandas
 plotly==5.22.0
+# required for visualizations
 numpy
 scikit-learn
 matplotlib

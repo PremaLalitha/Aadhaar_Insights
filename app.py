@@ -4,6 +4,35 @@ import plotly.express as px
 import os
 import numpy as np
 
+st.markdown(
+    """
+    <script>
+    const ignoredWarnings = [
+        "Unrecognized feature: 'ambient-light-sensor'",
+        "Unrecognized feature: 'battery'",
+        "Unrecognized feature: 'document-domain'",
+        "Unrecognized feature: 'layout-animations'",
+        "Unrecognized feature: 'legacy-image-format'",
+        "Unrecognized feature: 'oversized-images'",
+        "Unrecognized feature: 'vr'",
+        "Unrecognized feature: 'wake-lock'",
+        "An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing."
+    ];
+    const originalWarn = console.warn;
+    console.warn = function(msg, ...rest) {
+        if (ignoredWarnings.some(w => msg && msg.includes(w))) return;
+        originalWarn.apply(console, [msg, ...rest]);
+    };
+    const originalError = console.error;
+    console.error = function(msg, ...rest) {
+        if (ignoredWarnings.some(w => msg && msg.includes(w))) return;
+        originalError.apply(console, [msg, ...rest]);
+    };
+    </script>
+    """,
+    unsafe_allow_html=True
+)
+
 st.set_page_config(page_title="Aadhaar Insight", layout="wide", page_icon="🧪")
 
 @st.cache_data
