@@ -7,7 +7,6 @@ An automated intelligence platform that transforms fragmented Aadhaar registrati
 
 Aadhaar Insight consolidates enrolment, biometric, and demographic registration datasets into a unified analytical platform. The system enables stakeholders to monitor registration health, identify geographic trends, and generate insights for strategic decision-making.
 
----
 
 ## Key Features
 
@@ -34,7 +33,7 @@ Aadhaar Insight consolidates enrolment, biometric, and demographic registration 
 
 * Consolidates large datasets into an optimized analytical dataset for faster processing and visualization.
 
----
+
 
 ## Data Pipeline Audit
 
@@ -53,8 +52,6 @@ Aadhaar Insight consolidates enrolment, biometric, and demographic registration 
 | Total Enrolments    | 2,622,180  |
 | Demographic Updates | 23,662,875 |
 | Biometric Updates   | 54,811,336 |
-
----
 
 ## Technology Stack
 
