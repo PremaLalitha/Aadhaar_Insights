@@ -2,12 +2,6 @@
 
 An automated intelligence platform that transforms fragmented Aadhaar registration records into actionable geographic and demographic insights through data integration, analytics, and interactive visualizations.
 
-## Live Demo
-
-🚀 **Deployed Application:**
-https://premalalitha-aadhaar-insights-app-0bdyon.streamlit.app/
-
----
 
 ## Project Overview
 
